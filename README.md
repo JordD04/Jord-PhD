@@ -1,2 +1,2 @@
 # Jord-PhD
- Random Scripts to ease my PhD
+This is a place where I keep a bunch of random scripts I've written mostly for automation
