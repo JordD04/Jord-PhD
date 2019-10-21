@@ -1,13 +1,39 @@
-# script to output useful geometry optimisation data from .castep file to a more readable format
+#!/usr/bin/env python
+
+#script to output useful geometry optimisation data from .castep file to a more readable format
+
 
 import sys
 
 # file management for input file
-filename = sys.argv[1]
+#filename = sys.argv[1]
+filename = 'C8K_big.castep'
 file = open(filename, 'r')
 contents = file.readlines()
 
 OptDataList = []
+
+# finds tolerances
+x=0
+y=0
+while x == 0:
+    line = contents[y]
+    if "dE/ion" in line:
+        dELine = line.split()
+        dETol = dELine[5]               # pulls out dE/ion tolerance
+    if "|F|max" in line:
+        FLine = line.split()
+        FTol = FLine[5]                 # pulls out Fmax Tol
+    if "|dR|max" in line:
+        dRLine = line.split()
+        RTol = dRLine[5]                # pulls out dR tol
+    if "Smax" in line:
+        SLine = line.split()
+        STol = SLine[5]                 # pulls out Smax tol
+        x = 1
+    y = y + 1
+
+tolerance = ''.join(['Tol', ' ', dETol, '  ', FTol, '  ', RTol, '  ', STol ])
 
 
 # iterates through document to find geometry optimisation data
@@ -33,13 +59,25 @@ for line in contents:
         Smax = SLine[3]                 # pulls out Smax
         SOK = SLine[9]                  # pulls out whether Smax is optimised
 
+        OK_Stat_List = []
         if dEOK == "Yes":               # checks if optimisation was successful
-            if FOK == "Yes":
-                if dROK == "Yes":
-                    if SOK == "Yes":
-                            OK_Stat = "Yes"
+            OK_Stat_List.append('E')
+        if FOK == "Yes":
+            OK_Stat_List.append('F')
+        if dROK == "Yes":
+            OK_Stat_List.append('R')
+        if SOK == "Yes":
+            OK_Stat_List.append('S')
+        OK_Stat = "Yes"
+        if len(OK_Stat_List) == 0:
+            OK_Stat = ''
         else:
-            OK_Stat = "No"
+            if len(OK_Stat_List) == 4:
+                OK_Stat = '[Yes!]'
+            else:
+                OK_Stat = ','.join(OK_Stat_List)
+
+
 
         if int(Iteration) >= 100:            # just a formatting thing
             spacer = ' '
@@ -61,6 +99,7 @@ outputFileName = "".join([filePrefix, '.ezGeom'])
 outputFileOpen = open(outputFileName, 'w')
 
 outputFileOpen.write("Iteration  dE/ion     |F|max         |dR|max         Smax       OK?" + '\n')
+outputFileOpen.write(tolerance + '\n')
 
 for dataSet in OptDataList:
     outputFileOpen.write(dataSet + '\n')
