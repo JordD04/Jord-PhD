@@ -1,11 +1,13 @@
-# plots dE, F, dR, and S from an ezGeom file for the purposes of convergence testing
+#!/usr/bin/env python
+
+# plots Enthalpy, dE, F, dR, and S from an ezGeom file for the purposes of convergence testing
 
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
-#file = sys.argv[1]
-file = 'EDASOS-Cr.ezGeom'
+# file management for input file
+file = sys.argv[1]
 fileOpen = open(file, 'r')
 
 seed = file.split('.')[0]
@@ -18,6 +20,7 @@ lines = [line.rstrip('\n') for line in fileOpen]
 noLines = len(lines)
 
 ItList = []
+enthalpyList = []
 dEList = []
 FList = []
 dRList = []
@@ -39,15 +42,23 @@ x = 2
 while x < noLines:
     dataList = lines[x].split()
     ItList.append(x-2)
-    dEList.append(float(dataList[1]))
-    FList.append(float(dataList[2]))
-    dRList.append(float(dataList[3]))
-    SList.append(float(dataList[4]))
+    enthalpyList.append(float(dataList[1]))
+    dEList.append(float(dataList[2]))
+    FList.append(float(dataList[3]))
+    dRList.append(float(dataList[4]))
+    SList.append(float(dataList[5]))
     dETolList.append(dETol)
     FTolList.append(FTol)
     dRTolList.append(dRTol)
     STolList.append(STol)
     x = x + 1
+
+fig, ax = plt.subplots(figsize = (14,8))
+ax.plot(ItList, SList, marker='x', color='#535154', linestyle='-')
+plt.ylabel('Enthalpy / eV', fontsize='12')                                                           # sets axis labels
+plt.xlabel('Iteration / eV', fontsize='12')
+ax.grid(axis='y', linestyle='--', color='#808080')
+plt.savefig(fname=S_filename, format='png')
 
 fig, ax = plt.subplots(figsize = (14,8))
 ax.plot(ItList, dEList, marker='x', color='#396ab1', linestyle='-')

@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-#script to output useful geometry optimisation data from .castep file to a more readable format
+# script to output useful geometry optimisation data from .castep file to a more readable format
 
 
 import sys
 
 # file management for input file
-#filename = sys.argv[1]
-filename = 'C8K_big.castep'
+filename = sys.argv[1]
 file = open(filename, 'r')
 contents = file.readlines()
 
@@ -33,7 +32,7 @@ while x == 0:
         x = 1
     y = y + 1
 
-tolerance = ''.join(['Tol', ' ', dETol, '  ', FTol, '  ', RTol, '  ', STol ])
+tolerance = ''.join(['Tol', '                  ', dETol, '  ', FTol, '  ', RTol, '  ', STol])
 
 
 # iterates through document to find geometry optimisation data
@@ -88,7 +87,7 @@ for line in contents:
                 spacer = '   '
 
 
-        OptData = ''.join([Iteration, spacer, dEIon, '  ', Fmax, '  ', dRmax, '  ', Smax, '  ', OK_Stat]) # strings optimisation data together in convenient format
+        OptData = ''.join([Iteration, spacer, Enthalpy, ' ', dEIon, '  ', Fmax, '  ', dRmax, '  ', Smax, '  ', OK_Stat]) # strings optimisation data together in convenient format
         OptDataList.append(OptData)
 
 file.close()
@@ -98,7 +97,7 @@ filePrefix = filename.split(".")[0]
 outputFileName = "".join([filePrefix, '.ezGeom'])
 outputFileOpen = open(outputFileName, 'w')
 
-outputFileOpen.write("Iteration  dE/ion     |F|max         |dR|max         Smax       OK?" + '\n')
+outputFileOpen.write("Iteration Enthalpy   dE/ion         |F|max         |dR|max        Smax         OK?" + '\n')
 outputFileOpen.write(tolerance + '\n')
 
 for dataSet in OptDataList:
