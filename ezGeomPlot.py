@@ -1,12 +1,9 @@
-#!/usr/bin/env python
-
-# plots Enthalpy, dE, F, dR, and S from an ezGeom file for the purposes of convergence testing
+# plots dE, F, dR, and S from an ezGeom file for the purposes of convergence testing
 
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
-# file management for input file
 file = sys.argv[1]
 fileOpen = open(file, 'r')
 
@@ -54,7 +51,7 @@ while x < noLines:
     x = x + 1
 
 fig, ax = plt.subplots(figsize = (14,8))
-ax.plot(ItList, SList, marker='x', color='#535154', linestyle='-')
+ax.plot(ItList, enthalpyList, marker='x', color='#535154', linestyle='-')
 plt.ylabel('Enthalpy / eV', fontsize='12')                                                           # sets axis labels
 plt.xlabel('Iteration / eV', fontsize='12')
 ax.grid(axis='y', linestyle='--', color='#808080')
