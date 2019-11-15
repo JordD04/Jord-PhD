@@ -2,6 +2,7 @@
 
 # LZCT = LaZy Convergence Testing
 # script for automating CASTEP convergence testing
+# requires .param, .cell, and .job file in cwd
 
 import sys
 import os
@@ -165,22 +166,33 @@ def varKpointOutput(seed, dirPath, paramFileContents, cellFileContents1, cellFil
     open(cellFileName, 'w').write(cellFileContents0)
     (open(cellFileName, 'r')).close()
 
-
+#creates list of existing directories
+directories = []
+for dirs in os.walk(path):
+    existingDirectory = dirs[0].split(dirChar)
+    listLen = len(existingDirectory)
+    directories.append(''.join([existingDirectory[listLen-1], dirChar]))    #makes a list with just the directory name with the dir char at the end
 
 # sets up convergence testing with variable cutoff
 if DFTvariable == "c":
     kpoint, cellFileContents, paramFileContents1, paramFileContents2 = varCutoffInput(seed)
     for i in variableList:
         directoryName = ''.join([seed, "-", str(math.trunc(float(i))), "-", kpoint, dirChar])  # determines name of new directory for const kpoint
-        dirPath, jobFileName = jobScriptMaker(path, directoryName, seed, i)
-        varCutoffOutput(seed, dirPath, cellFileContents, paramFileContents1, paramFileContents2, i)
-        subprocess.run(["sbatch", "-D", dirPath, jobFileName])
+        if directoryName in directories:
+            pass
+        else:
+            dirPath, jobFileName = jobScriptMaker(path, directoryName, seed, i)
+            varCutoffOutput(seed, dirPath, cellFileContents, paramFileContents1, paramFileContents2, i)
+            subprocess.run(["sbatch", "-D", dirPath, jobFileName])
 
 # sets up convergence testing with variable kpoint spacing
 if DFTvariable == "k":
     cutoff, paramFileContents, cellFileContents1, cellFileContents2 = varKpointInput(seed)
     for i in variableList:
         directoryName = ''.join([seed, "-", cutoff, "-", i, dirChar])                           # determines name of new directory for const cutoff
-        dirPath = jobScriptMaker(path, directoryName, seed, i)
-        varKpointOutput(seed, dirPath, paramFileContents, cellFileContents1, cellFileContents2, i)
-        subprocess.run(["sbatch", "-D", dirPath, jobFileName])
+        if directoryName in directories:
+            pass
+        else:
+            dirPath, jobFileName = jobScriptMaker(path, directoryName, seed, i)
+            varKpointOutput(seed, dirPath, paramFileContents, cellFileContents1, cellFileContents2, i)
+            subprocess.run(["sbatch", "-D", dirPath, jobFileName])
